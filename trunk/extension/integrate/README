@@ -1,0 +1,37 @@
+Integrate Module
+===========================
+This module introduces 2 new datatypes
++ external option
++ external multi option
+
+
+Installation
+-----------------
+Follow these steps to add the integrate module to your eZ publish installation:
+
+  1) Extract the archive into the /extension directory
+
+  2) Edit site.ini.append in /settings/override. Add the following to the file:
+
+       [ExtensionSettings]
+       ActiveExtensions[]=integrate
+
+     If you already have the [ExtensionSettings] block, just add the second line.
+
+Usage
+-----------------
+
+License
+-----------------
+
+This file may be distributed and/or modified under the terms of the "GNU
+General Public License" version 2 as published by the Free Software Foundation
+
+This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+The "GNU General Public License" (GPL) is available at
+http://www.gnu.org/copyleft/gpl.html.
+
+Contact license@designit.com.au if any conditions of this licencing isn't clear to you.
+
