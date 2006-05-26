@@ -33,7 +33,9 @@ class ExternalOptionType extends eZDataType
   */
   function ExternalOptionType()
   {
-    $this->eZDataType( EZ_DATATYPESTRING_EXTERNALOPTION, "External Option" );
+    $this->eZDataType( EZ_DATATYPESTRING_EXTERNALOPTION, "External Option", 
+                           array( 'serialize_supported' => true,
+                                  'object_serialize_map' => array( 'data_int' => 'value' ) ) );
   }
 
   /*!
@@ -43,7 +45,26 @@ class ExternalOptionType extends eZDataType
   function validateObjectAttributeHTTPInput( &$http, $base, 
                                                &$contentObjectAttribute )
   {
-    return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+    $variable = $base . "_data_int_" . $contentObjectAttribute->attribute( "id" );
+    eZDebug::writeDebug( $contentObjectAttribute );
+    if ( $http->hasPostVariable($variable ))
+    {
+      $data = $http->postVariable($variable ); 
+      eZDebug::writeDebug( $data );
+      if( !$contentObjectAttribute->validateIsRequired() && ( $data == "" ) )
+      {
+        return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+      }
+      if (is_numeric($data))
+        return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+      else
+        $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes', 'You must select an option' ));
+    }
+    else
+    {
+      return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+    }
+    return EZ_INPUT_VALIDATOR_STATE_INVALID;
   }
 
   function deleteStoredObjectAttribute( &$contentObjectAttribute, $version = null )
@@ -57,12 +78,14 @@ class ExternalOptionType extends eZDataType
 
    function fetchObjectAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
    {
-     if ( $http->hasPostVariable( $base . "_data_int_" . 
-                                  $contentObjectAttribute->attribute( "id" ) ) )
+     $variable = $base . "_data_int_" . $contentObjectAttribute->attribute( "id" );
+     if ( $http->hasPostVariable($variable ) )
      {
        $data =& $http->postVariable( $base . "_data_int_" . 
                                      $contentObjectAttribute->attribute( "id" ) 
                                    );
+       if (! is_numeric($data))
+         $data = null;
        $contentObjectAttribute->setAttribute( "data_int", $data );
        return true;
      }
