@@ -103,35 +103,42 @@ class ExternalMultipleOptionType extends eZDataType
   /*!
    Returns the meta data used for storing search indices.
   */
-  function metaData( $contentObjectAttribute )
+  function metaData( &$contentObjectAttribute )
   {
-    $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
-    $contentObjectID = $contentObjectAttribute->attribute( 'id' );
-    $version = $contentObjectAttribute->attribute( "data_int" );
-    //
-    $table    = $contentClassAttribute->attribute( 'data_text1' );
-    $index    = $contentClassAttribute->attribute( 'data_text2' );
-    $name     = $contentClassAttribute->attribute( 'data_text3' );
-    $storage  = $contentClassAttribute->attribute( 'data_text4' );
-
-    $db =& eZDB::instance();
-    $query = "SELECT $index as val, $name as label FROM $table ORDER BY label";
-    $result = $db->arrayQuery($query);
-    $options = array();
-    foreach ($result as $row)
-    {
-      $options[$row['val']]=$row['label'];
-    }
-
-    $query = "SELECT $index as val FROM $storage WHERE contentobject_attribute_id = $contentObjectID AND version = $version";
-    $dbresult = $db->arrayQuery($query);
     $returnArray=array();
-    foreach ($dbresult as $row)
+
+    if ($contentObjectAttribute)
     {
-      $returnArray[]=$options[$row['val']];
+      $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
+      $contentObjectID = $contentObjectAttribute->attribute( 'id' );
+      $version = $contentObjectAttribute->attribute( "data_int" );
+      //
+      $table    = $contentClassAttribute->attribute( 'data_text1' );
+      $index    = $contentClassAttribute->attribute( 'data_text2' );
+      $name     = $contentClassAttribute->attribute( 'data_text3' );
+      $storage  = $contentClassAttribute->attribute( 'data_text4' );
+
+      $db =& eZDB::instance();
+      $query = "SELECT $index as val, $name as label FROM $table ORDER BY label";
+      $result = $db->arrayQuery($query);
+      $options = array();
+      foreach ($result as $row)
+      {
+        $options[$row['val']]=$row['label'];
+      }
+
+      $query = "SELECT $index as val FROM $storage WHERE contentobject_attribute_id = $contentObjectID AND version = $version";
+      $dbresult = $db->arrayQuery($query);
+      $returnArray=array();
+      foreach ($dbresult as $row)
+      {
+        $returnArray[]=$options[$row['val']];
+      }
     }
     return join(' ',$returnArray);
   }
+
+
 
   /*!
    Returns the text.
@@ -158,7 +165,7 @@ class ExternalMultipleOptionType extends eZDataType
 
   function hasObjectAttributeContent( &$contentObjectAttribute )
   {
-    return ($this->metaData() != '');
+    return ($this->metaData($contentObjectAttribute) != '');
   }
  
   /*!
