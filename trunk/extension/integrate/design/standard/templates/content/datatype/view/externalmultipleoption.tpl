@@ -1,5 +1,8 @@
-{section loop=$attribute.content.options}
-{section show=$attribute.content.value|contains($item.val)}{$item.label|wash(xhtml)}<br/>{/section}
-
-{/section}
-
+{default seperator='<br />'}
+{def $items=array()}
+{foreach $attribute.content.options as $option}
+  {if $attribute.content.value|contains($option.val)}{set $items=$items|append($option.label|wash)}{/if}
+{/foreach}
+{$items|implode($seperator)}
+{undef $items}
+{/default}
