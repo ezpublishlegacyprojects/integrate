@@ -48,14 +48,14 @@ class ExternalMultipleOptionType extends eZDataType
 
   function deleteStoredObjectAttribute( &$contentObjectAttribute, $version = null )
   {
-    $contentObjectID = $contentObjectAttribute->attribute( 'id' );
+    $contentObjectAttributeID = $contentObjectAttribute->attribute( 'id' );
     $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
     $index    = $contentClassAttribute->attribute( 'data_text2' );
     $storage  = $contentClassAttribute->attribute( 'data_text4' );
     $version_sql ='';
     if ($version != null)
       $version_sql = " AND version = $version";
-    $query = "DELETE FROM $storage WHERE contentobject_attribute_id = $contentObjectID" . $version_sql;
+    $query = "DELETE FROM $storage WHERE contentobject_attribute_id = $contentObjectAttributeID" . $version_sql;
     $db =& eZDB::instance();
     $result = $db->query($query);
   }
@@ -71,7 +71,8 @@ class ExternalMultipleOptionType extends eZDataType
        $data =& $http->postVariable( $base . "_data_int_" . 
                                      $contentObjectAttribute->attribute( "id" ) 
                                    );
-       $contentObjectID = $contentObjectAttribute->attribute( 'id' );
+       $contentObjectAttributeID = $contentObjectAttribute->attribute( 'id' );
+       $contentObjectID = $contentObjectAttribute->attribute( 'contentobject_id' );
        $version = $contentObjectAttribute->attribute( "version" );
 
        $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
@@ -82,7 +83,7 @@ class ExternalMultipleOptionType extends eZDataType
        {
          foreach ($data as $val)
          {
-           $query = "INSERT INTO $storage (contentobject_attribute_id, version, $index) VALUES ($contentObjectID, $version, $val)";
+           $query = "INSERT INTO $storage (contentobject_id, contentobject_attribute_id, version, $index) VALUES ($contentObjectID, $contentObjectAttributeID, $version, $val)";
            $result = $db->query($query);
          }
        }
@@ -110,7 +111,7 @@ class ExternalMultipleOptionType extends eZDataType
     if ($contentObjectAttribute)
     {
       $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
-      $contentObjectID = $contentObjectAttribute->attribute( 'id' );
+      $contentObjectAttributeID = $contentObjectAttribute->attribute( 'id' );
       $version = $contentObjectAttribute->attribute( "data_int" );
       //
       $table    = $contentClassAttribute->attribute( 'data_text1' );
@@ -127,12 +128,15 @@ class ExternalMultipleOptionType extends eZDataType
         $options[$row['val']]=$row['label'];
       }
 
-      $query = "SELECT $index as val FROM $storage WHERE contentobject_attribute_id = $contentObjectID AND version = $version";
-      $dbresult = $db->arrayQuery($query);
       $returnArray=array();
-      foreach ($dbresult as $row)
+      if (is_numeric($contentObjectAttributeID) && is_numeric($version))
       {
-        $returnArray[]=$options[$row['val']];
+        $query = "SELECT $index as val FROM $storage WHERE contentobject_attribute_id = $contentObjectAttributeID AND version = $version";
+        $dbresult = $db->arrayQuery($query);
+        foreach ($dbresult as $row)
+        {
+          $returnArray[]=$options[$row['val']];
+        }
       }
     }
     return join(' ',$returnArray);
@@ -174,7 +178,7 @@ class ExternalMultipleOptionType extends eZDataType
   function &objectAttributeContent( &$contentObjectAttribute )
   {
       $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
-      $contentObjectID = $contentObjectAttribute->attribute( 'id' );
+      $contentObjectAttributeID = $contentObjectAttribute->attribute( 'id' );
       $version = $contentObjectAttribute->attribute( "data_int" );
       //
       $table    = $contentClassAttribute->attribute( 'data_text1' );
@@ -199,7 +203,7 @@ class ExternalMultipleOptionType extends eZDataType
       $result = $db->arrayQuery($query);
       $output['options'] =& $result;
 
-      $query = "SELECT $index as val FROM $storage WHERE contentobject_attribute_id = $contentObjectID AND version = $version";
+      $query = "SELECT $index as val FROM $storage WHERE contentobject_attribute_id = $contentObjectAttributeID AND version = $version";
       $dbresult = $db->arrayQuery($query);
       $values = array();
       foreach ($dbresult as $row)

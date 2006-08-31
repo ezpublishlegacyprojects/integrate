@@ -107,12 +107,17 @@ class ExternalOptionType extends eZDataType
   {
     $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
     //
-    $table = $contentClassAttribute->attribute( 'data_text1' );
-    $index = $contentClassAttribute->attribute( 'data_text2' );
-    $name  = $contentClassAttribute->attribute( 'data_text3' );
-    $db =& eZDB::instance();
-    $query = "SELECT $name as label FROM $table WHERE $index = ".$contentObjectAttribute->attribute( "data_int" );
-    $result = $db->arrayQuery($query);
+    $index_value = $contentObjectAttribute->attribute( "data_int" );
+    $result=array();
+    if (is_numeric($index_value))
+    {
+      $table = $contentClassAttribute->attribute( 'data_text1' );
+      $index = $contentClassAttribute->attribute( 'data_text2' );
+      $name  = $contentClassAttribute->attribute( 'data_text3' );
+      $db =& eZDB::instance();
+      $query = "SELECT $name as label FROM $table WHERE $index = ".$contentObjectAttribute->attribute( "data_int" );
+      $result = $db->arrayQuery($query);
+    }
     if (is_array($result) && count($result) == 1)
       return $result[0]['label'];
     else
@@ -166,7 +171,7 @@ class ExternalOptionType extends eZDataType
       {
         if ($row['Field'] == 'order')
         {
-          $order = 'ORDER BY `order`';
+          $order = 'ORDER BY `order`, label';
           break;
         }
       }
@@ -190,7 +195,7 @@ class ExternalOptionType extends eZDataType
       {
         if ($row['Field'] == 'order')
         {
-          $order = 'ORDER BY `order`';
+          $order = 'ORDER BY `order`, label';
           break;
         }
       }
