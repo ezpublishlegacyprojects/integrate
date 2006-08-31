@@ -11,4 +11,8 @@
     <label>Name Column</label>
     <p>{$class_attribute.data_text3|wash}</p>
   </div>
+  <div class="element">
+    <label>Default Index</label>
+    <p>{$class_attribute.data_int1|wash}</p>
+  </div>
 </div>

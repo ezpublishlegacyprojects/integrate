@@ -163,6 +163,7 @@ class ExternalOptionType extends eZDataType
       $table = $contentClassAttribute->attribute( 'data_text1' );
       $index = $contentClassAttribute->attribute( 'data_text2' );
       $name  = $contentClassAttribute->attribute( 'data_text3' );
+      $default  = $contentClassAttribute->attribute( 'data_int1' );
       $db =& eZDB::instance();
       $query = "SHOW COLUMNS FROM $table";
       $result = $db->arrayQuery($query);
@@ -178,6 +179,7 @@ class ExternalOptionType extends eZDataType
       $query = "SELECT $index as val, $name as label FROM $table ".$order;
       $result = $db->arrayQuery($query);
       $output['options'] =& $result;
+      $output['default'] = $default;
       $output['value'] =& $contentObjectAttribute->attribute( "data_int" );
       return $output;
   }
@@ -187,6 +189,7 @@ class ExternalOptionType extends eZDataType
     $table = $classAttribute->attribute( 'data_text1' );
     $index = $classAttribute->attribute( 'data_text2' );
     $name  = $classAttribute->attribute( 'data_text3' );
+    $default  = $classAttribute->attribute( 'data_int1' );
     $db =& eZDB::instance();
       $query = "SHOW COLUMNS FROM $table";
       $result = $db->arrayQuery($query);
@@ -202,6 +205,7 @@ class ExternalOptionType extends eZDataType
       $query = "SELECT $index as val, $name as label FROM $table ".$order;
     $result = $db->arrayQuery($query);
     $output['options'] =& $result;
+    $output['default'] = $default;
     return $output;
   }
 
@@ -235,6 +239,7 @@ class ExternalOptionType extends eZDataType
     $defaultValueTable = $base . '_externaloption_table_'  . $classAttribute->attribute( 'id' );
     $defaultValueIndex = $base . '_externaloption_index_'  . $classAttribute->attribute( 'id' );
     $defaultValueName = $base . '_externaloption_name_'  . $classAttribute->attribute( 'id' );
+    $defaultValueDefault = $base . '_externaloption_default_'  . $classAttribute->attribute( 'id' );
     $returnvalue = false;
     if ( $http->hasPostVariable( $defaultValueTable ) )
     {
@@ -272,10 +277,16 @@ class ExternalOptionType extends eZDataType
       $returnvalue=true;
     }
 
+    if ( $http->hasPostVariable( $defaultValueDefault ) )
+    {
+      $defaultValueDefaultValue = $http->postVariable( $defaultValueDefault);
+      if (is_numeric($defaultValueDefaultValue))
+        $classAttribute->setAttribute( 'data_int1', $defaultValueDefaultValue );
+      else
+        $returnvalue=false;
+    }
     return $returnvalue;
   }
-
-
 
 }
 eZDataType::register( EZ_DATATYPESTRING_EXTERNALOPTION, "externaloptiontype" );
