@@ -67,6 +67,30 @@ class ExternalOptionType extends eZDataType
     return EZ_INPUT_VALIDATOR_STATE_INVALID;
   }
 
+  function validateCollectionAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
+  {
+    $variable = $base . "_data_int_" . $contentObjectAttribute->attribute( "id" );
+    eZDebug::writeDebug( $contentObjectAttribute );
+    if ( $http->hasPostVariable($variable ))
+    {
+      $data = $http->postVariable($variable ); 
+      eZDebug::writeDebug( $data );
+      if( !$contentObjectAttribute->validateIsRequired() && ( $data == "" ) )
+      {
+        return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+      }
+      if (is_numeric($data))
+        return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+      else
+        $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes', 'You must select an option' ));
+    }
+    else
+    {
+      return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+    }
+    return EZ_INPUT_VALIDATOR_STATE_INVALID;
+  }
+ 
   function deleteStoredObjectAttribute( &$contentObjectAttribute, $version = null )
   {
     $contentObjectID = $contentObjectAttribute->ContentObjectID;
@@ -87,6 +111,25 @@ class ExternalOptionType extends eZDataType
        if (! is_numeric($data))
          $data = null;
        $contentObjectAttribute->setAttribute( "data_int", $data );
+       return true;
+     }
+     return false;
+   }
+
+   /*!
+    Fetches the http post variables for collected information
+   */
+   function fetchCollectionAttributeHTTPInput( &$collection, &$collectionAttribute, &$http, $base, &$contentObjectAttribute )
+   {
+     $variable = $base . "_data_int_" . $contentObjectAttribute->attribute( "id" );
+     if ( $http->hasPostVariable($variable ) )
+     {
+       $data =& $http->postVariable( $base . "_data_int_" . 
+                                     $contentObjectAttribute->attribute( "id" ) 
+                                   );
+       if (! is_numeric($data))
+         $data = null;
+       $collectionAttribute->setAttribute( "data_int", $data );
        return true;
      }
      return false;
@@ -133,6 +176,11 @@ class ExternalOptionType extends eZDataType
   }
 
   function isIndexable()
+  {
+    return true;
+  }
+
+  function isInformationCollector()
   {
     return true;
   }
