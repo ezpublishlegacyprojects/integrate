@@ -19,21 +19,22 @@
 
 
 // Include the super class file
-include_once( "kernel/classes/ezdatatype.php" );
-
-// Define the name of datatype string
-define( "EZ_DATATYPESTRING_EXTERNALOPTION", "externaloption" );
+///include_once( "kernel/classes/ezdatatype.php" );
 
 
 class ExternalOptionType extends eZDataType
 {
+
+  // Define the name of datatype string
+  const DATA_TYPE_STRING = "externaloption";
+
   /*!
-   Construction of the class, note that the second parameter in eZDataType 
+   Construction of the class, note that the second parameter in eZDataType
    is the actual name showed in the datatype dropdown list.
   */
   function ExternalOptionType()
   {
-    $this->eZDataType( EZ_DATATYPESTRING_EXTERNALOPTION, "External Option", 
+    $this->eZDataType( self::DATA_TYPE_STRING, "External Option",
                            array( 'serialize_supported' => true,
                                   'object_serialize_map' => array( 'data_int' => 'value' ) ) );
   }
@@ -42,56 +43,56 @@ class ExternalOptionType extends eZDataType
     Validates the input and returns true if the input was
     valid for this datatype.
   */
-  function validateObjectAttributeHTTPInput( &$http, $base, 
-                                               &$contentObjectAttribute )
+  function validateObjectAttributeHTTPInput( $http, $base,
+                                               $contentObjectAttribute )
   {
     $variable = $base . "_data_int_" . $contentObjectAttribute->attribute( "id" );
     eZDebug::writeDebug( $contentObjectAttribute );
-    if ( $http->hasPostVariable($variable ))
+    if ( $http->hasPostVariable( $variable ))
     {
-      $data = $http->postVariable($variable ); 
+      $data = $http->postVariable( $variable );
       eZDebug::writeDebug( $data );
       if( !$contentObjectAttribute->validateIsRequired() && ( $data == "" ) )
       {
-        return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+        return eZInputValidator::STATE_ACCEPTED;
       }
       if (is_numeric($data))
-        return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+        return eZInputValidator::STATE_ACCEPTED;
       else
         $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes', 'You must select an option' ));
     }
     else
     {
-      return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+      return eZInputValidator::STATE_ACCEPTED;
     }
-    return EZ_INPUT_VALIDATOR_STATE_INVALID;
+    return eZInputValidator::STATE_INVALID;
   }
 
-  function validateCollectionAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
+  function validateCollectionAttributeHTTPInput( $http, $base, $contentObjectAttribute )
   {
     $variable = $base . "_data_int_" . $contentObjectAttribute->attribute( "id" );
     eZDebug::writeDebug( $contentObjectAttribute );
     if ( $http->hasPostVariable($variable ))
     {
-      $data = $http->postVariable($variable ); 
+      $data = $http->postVariable($variable );
       eZDebug::writeDebug( $data );
       if( !$contentObjectAttribute->validateIsRequired() && ( $data == "" ) )
       {
-        return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+        return eZInputValidator::STATE_ACCEPTED;
       }
       if (is_numeric($data))
-        return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+        return eZInputValidator::STATE_ACCEPTED;
       else
         $contentObjectAttribute->setValidationError( ezi18n( 'kernel/classes/datatypes', 'You must select an option' ));
     }
     else
     {
-      return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+      return eZInputValidator::STATE_ACCEPTED;
     }
-    return EZ_INPUT_VALIDATOR_STATE_INVALID;
+    return eZInputValidator::STATE_INVALID;
   }
- 
-  function deleteStoredObjectAttribute( &$contentObjectAttribute, $version = null )
+
+  function deleteStoredObjectAttribute( $contentObjectAttribute, $version = null )
   {
     $contentObjectID = $contentObjectAttribute->ContentObjectID;
   }
@@ -100,13 +101,13 @@ class ExternalOptionType extends eZDataType
  /*!
  */
 
-   function fetchObjectAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
+   function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
    {
      $variable = $base . "_data_int_" . $contentObjectAttribute->attribute( "id" );
      if ( $http->hasPostVariable($variable ) )
      {
-       $data =& $http->postVariable( $base . "_data_int_" . 
-                                     $contentObjectAttribute->attribute( "id" ) 
+       $data = $http->postVariable( $base . "_data_int_" .
+                                     $contentObjectAttribute->attribute( "id" )
                                    );
        if (! is_numeric($data))
          $data = null;
@@ -119,13 +120,13 @@ class ExternalOptionType extends eZDataType
    /*!
     Fetches the http post variables for collected information
    */
-   function fetchCollectionAttributeHTTPInput( &$collection, &$collectionAttribute, &$http, $base, &$contentObjectAttribute )
+   function fetchCollectionAttributeHTTPInput( $collection, $collectionAttribute, $http, $base, $contentObjectAttribute )
    {
      $variable = $base . "_data_int_" . $contentObjectAttribute->attribute( "id" );
      if ( $http->hasPostVariable($variable ) )
      {
-       $data =& $http->postVariable( $base . "_data_int_" . 
-                                     $contentObjectAttribute->attribute( "id" ) 
+       $data = $http->postVariable( $base . "_data_int_" .
+                                     $contentObjectAttribute->attribute( "id" )
                                    );
        if (! is_numeric($data))
          $data = null;
@@ -136,10 +137,10 @@ class ExternalOptionType extends eZDataType
    }
 
   /*!
-   Store the content. Since the content has been stored in function 
+   Store the content. Since the content has been stored in function
    fetchObjectAttributeHTTPInput(), this function is with empty code.
   */
-  function storeObjectAttribute( &$contentObjectattribute )
+  function storeObjectAttribute( $contentObjectattribute )
   {
   }
 
@@ -148,7 +149,7 @@ class ExternalOptionType extends eZDataType
   */
   function metaData( $contentObjectAttribute )
   {
-    $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
+    $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
     //
     $index_value = $contentObjectAttribute->attribute( "data_int" );
     $result=array();
@@ -157,7 +158,7 @@ class ExternalOptionType extends eZDataType
       $table = $contentClassAttribute->attribute( 'data_text1' );
       $index = $contentClassAttribute->attribute( 'data_text2' );
       $name  = $contentClassAttribute->attribute( 'data_text3' );
-      $db =& eZDB::instance();
+      $db = eZDB::instance();
       $query = "SELECT $name as label FROM $table WHERE $index = ".$contentObjectAttribute->attribute( "data_int" );
       $result = $db->arrayQuery($query);
     }
@@ -170,7 +171,7 @@ class ExternalOptionType extends eZDataType
   /*!
    Returns the text.
   */
-  function title( &$contentObjectAttribute )
+  function title( $contentObjectAttribute, $name = null )
   {
     return $this->metaData($contentObjectAttribute);
   }
@@ -185,34 +186,34 @@ class ExternalOptionType extends eZDataType
     return true;
   }
 
-  function sortKey( &$contentObjectAttribute )
+  function sortKey( $contentObjectAttribute )
   {
     return $this->metaData($contentObjectAttribute);
   }
-  
+
   function sortKeyType()
   {
     return 'string';
   }
 
-  function hasObjectAttributeContent( &$contentObjectAttribute )
+  function hasObjectAttributeContent( $contentObjectAttribute )
   {
     return is_numeric($contentObjectAttribute->attribute( "data_int" ));
   }
-  
+
 
   /*!
    Returns the content.
   */
-  function &objectAttributeContent( &$contentObjectAttribute )
+  function objectAttributeContent( $contentObjectAttribute )
   {
-      $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
+      $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
       //
       $table = $contentClassAttribute->attribute( 'data_text1' );
       $index = $contentClassAttribute->attribute( 'data_text2' );
       $name  = $contentClassAttribute->attribute( 'data_text3' );
       $default  = $contentClassAttribute->attribute( 'data_int1' );
-      $db =& eZDB::instance();
+      $db = eZDB::instance();
       $query = "SHOW COLUMNS FROM $table";
       $result = $db->arrayQuery($query);
       $order = 'ORDER BY label';
@@ -226,19 +227,19 @@ class ExternalOptionType extends eZDataType
       }
       $query = "SELECT $index as val, $name as label FROM $table ".$order;
       $result = $db->arrayQuery($query);
-      $output['options'] =& $result;
+      $output['options'] = $result;
       $output['default'] = $default;
-      $output['value'] =& $contentObjectAttribute->attribute( "data_int" );
+      $output['value'] = $contentObjectAttribute->attribute( "data_int" );
       return $output;
   }
 
-  function &classAttributeContent(&$classAttribute)
+  function classAttributeContent($classAttribute)
   {
     $table = $classAttribute->attribute( 'data_text1' );
     $index = $classAttribute->attribute( 'data_text2' );
     $name  = $classAttribute->attribute( 'data_text3' );
     $default  = $classAttribute->attribute( 'data_int1' );
-    $db =& eZDB::instance();
+    $db = eZDB::instance();
       $query = "SHOW COLUMNS FROM $table";
       $result = $db->arrayQuery($query);
       $order = 'ORDER BY label';
@@ -252,7 +253,7 @@ class ExternalOptionType extends eZDataType
       }
       $query = "SELECT $index as val, $name as label FROM $table ".$order;
     $result = $db->arrayQuery($query);
-    $output['options'] =& $result;
+    $output['options'] = $result;
     $output['default'] = $default;
     return $output;
   }
@@ -265,16 +266,16 @@ class ExternalOptionType extends eZDataType
 /*
  Not sure I need this
 */
-  function initializeObjectAttribute( &$contentObjectAttribute, $currentVersion, &$originalContentObjectAttribute )
+  function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
   {
     if ( $currentVersion == false )
     {
-      $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
+      $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
       //
       $table = $contentClassAttribute->attribute( 'data_text1' );
       $index = $contentClassAttribute->attribute( 'data_text2' );
       $name  = $contentClassAttribute->attribute( 'data_text3' );
-      $db =& eZDB::instance();
+      $db = eZDB::instance();
       $query = "SELECT $index as val, $name as label FROM $table ORDER BY label";
       $result = $db->arrayQuery($query);
       $contentObjectAttribute->setContent( $result );
@@ -282,7 +283,7 @@ class ExternalOptionType extends eZDataType
   }
 
 
-  function fetchClassAttributeHTTPInput( &$http, $base, &$classAttribute )
+  function fetchClassAttributeHTTPInput( $http, $base, $classAttribute )
   {
     $defaultValueTable = $base . '_externaloption_table_'  . $classAttribute->attribute( 'id' );
     $defaultValueIndex = $base . '_externaloption_index_'  . $classAttribute->attribute( 'id' );
@@ -337,4 +338,7 @@ class ExternalOptionType extends eZDataType
   }
 
 }
-eZDataType::register( EZ_DATATYPESTRING_EXTERNALOPTION, "externaloptiontype" );
+
+eZDataType::register( ExternalOptionType::DATA_TYPE_STRING, "externaloptiontype" );
+
+?>
