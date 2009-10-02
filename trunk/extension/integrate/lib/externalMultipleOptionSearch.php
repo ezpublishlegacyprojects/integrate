@@ -18,7 +18,7 @@
 //
 
 
-include_once( 'kernel/classes/ezcontentclassattribute.php' );
+//include_once( 'kernel/classes/ezcontentclassattribute.php' );
 
 class externalMultipleOptionSearch
 {
@@ -29,18 +29,18 @@ class externalMultipleOptionSearch
   {
     // Empty...
   }
- 
+
   function createSqlParts( $params )
   {
-    /* $params showld be a hash with 2 values 
+    /* $params showld be a hash with 2 values
        attribute_id - the attribute id of the externalMultipleOption attribute
        values       - an array of integers to match */
     $sqlTables = '';
     $sqlCond   = '';
     if ( isset($params['attribute_id']) &&
-         isset($params['values']) && 
-         is_array($params['values']) && 
-         count($params['values']) > 0 && 
+         isset($params['values']) &&
+         is_array($params['values']) &&
+         count($params['values']) > 0 &&
          is_numeric($params['values'][0])
        )
     {
@@ -49,10 +49,10 @@ class externalMultipleOptionSearch
 
       // Retrieve class attribute  and check that it's the right type
       $contentClassAttribute =& eZContentClassAttribute::fetch($class_attribute_id);
- 
+
       if ( $contentClassAttribute && $contentClassAttribute->attribute('data_type_string') == 'externalmultipleoption')
       {
-  
+
         eZDebug::writeDebug("externalMultipleOptionSearch: good data building query" );
         $index    = $contentClassAttribute->attribute( 'data_text2' );
         $name     = $contentClassAttribute->attribute( 'data_text3' );
@@ -73,7 +73,7 @@ class externalMultipleOptionSearch
         {
           $IDs[]="(".$row['contentobject_id'].','.$row['version'].')';
         }
-        if (count($IDs) != 0 ) 
+        if (count($IDs) != 0 )
         {
           $sqlTables = ", ezcontentobject_attribute externalmultipleoptionSearch";
 
@@ -81,10 +81,10 @@ class externalMultipleOptionSearch
           $sqlJoinArray[] = "externalmultipleoptionSearch.contentobject_id = ezcontentobject.id";
           $sqlJoinArray[] = "externalmultipleoptionSearch.contentclassattribute_id = ".$class_attribute_id ;
           $sqlJoinArray[] = "externalmultipleoptionSearch.version = ezcontentobject_name.content_version";
-  
+
           $sqlCondArray = array();
           $sqlCondArray[] = '(externalmultipleoptionSearch.contentobject_id,externalmultipleoptionSearch.version) IN ('.join(',',$IDs).')';
-    
+
           $sqlCond = implode( " AND \n", $sqlJoinArray )." AND \n (".implode( " AND \n ", $sqlCondArray ) .') AND ';
         }
         else
