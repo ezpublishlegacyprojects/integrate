@@ -19,66 +19,66 @@
 
 
 // Include the super class file
-include_once( "kernel/classes/ezdatatype.php" );
-
-// Define the name of datatype string
-define( "EZ_DATATYPESTRING_EXTERNALMULTIPLEOPTION", "externalmultipleoption" );
+//include_once( "kernel/classes/ezdatatype.php" );
 
 
 class ExternalMultipleOptionType extends eZDataType
 {
+  // Define the name of datatype string
+  const DATA_TYPE_STRING = "externalmultipleoption";
+
   /*!
-   Construction of the class, note that the second parameter in eZDataType 
+   Construction of the class, note that the second parameter in eZDataType
    is the actual name showed in the datatype dropdown list.
   */
   function ExternalMultipleOptionType()
   {
-    $this->eZDataType( EZ_DATATYPESTRING_EXTERNALMULTIPLEOPTION, "External Multiple Option" );
+    $this->eZDataType( ExternalMultipleOptionType::DATA_TYPE_STRING, "External Multiple Option" );
   }
 
   /*!
     Validates the input and returns true if the input was
     valid for this datatype.
   */
-  function validateObjectAttributeHTTPInput( &$http, $base, 
-                                               &$contentObjectAttribute )
+  function validateObjectAttributeHTTPInput( $http, $base,
+                                               $contentObjectAttribute )
   {
-    return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+    return eZInputValidator::STATE_ACCEPTED;
   }
 
-  function deleteStoredObjectAttribute( &$contentObjectAttribute, $version = null )
+  function deleteStoredObjectAttribute( $contentObjectAttribute, $version = null )
   {
     $contentObjectAttributeID = $contentObjectAttribute->attribute( 'id' );
-    $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
+    $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
     $index    = $contentClassAttribute->attribute( 'data_text2' );
     $storage  = $contentClassAttribute->attribute( 'data_text4' );
     $version_sql ='';
     if ($version != null)
       $version_sql = " AND version = $version";
     $query = "DELETE FROM $storage WHERE contentobject_attribute_id = $contentObjectAttributeID" . $version_sql;
-    $db =& eZDB::instance();
+    $db = eZDB::instance();
     $result = $db->query($query);
   }
 
  /*!
  */
 
-   function fetchObjectAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
+   function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
    {
-     if ( $http->hasPostVariable( $base . "_data_int_" . 
+     if ( $http->hasPostVariable( $base . "_data_int_" .
                                   $contentObjectAttribute->attribute( "id" ) ) )
      {
-       $data =& $http->postVariable( $base . "_data_int_" . 
-                                     $contentObjectAttribute->attribute( "id" ) 
+       $data = $http->postVariable( $base . "_data_int_" .
+                                     $contentObjectAttribute->attribute( "id" )
                                    );
        $contentObjectAttributeID = $contentObjectAttribute->attribute( 'id' );
        $contentObjectID = $contentObjectAttribute->attribute( 'contentobject_id' );
        $version = $contentObjectAttribute->attribute( "version" );
 
-       $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
+       $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
        $index    = $contentClassAttribute->attribute( 'data_text2' );
        $storage  = $contentClassAttribute->attribute( 'data_text4' );
-       $db =& eZDB::instance();
+       $db = eZDB::instance();
        if (is_array($data))
        {
          foreach ($data as $val)
@@ -94,23 +94,23 @@ class ExternalMultipleOptionType extends eZDataType
    }
 
   /*!
-   Store the content. Since the content has been stored in function 
+   Store the content. Since the content has been stored in function
    fetchObjectAttributeHTTPInput(), this function is with empty code.
   */
-  function storeObjectAttribute( &$contentObjectattribute )
+  function storeObjectAttribute( $contentObjectattribute )
   {
   }
 
   /*!
    Returns the meta data used for storing search indices.
   */
-  function metaData( &$contentObjectAttribute )
+  function metaData( $contentObjectAttribute )
   {
     $returnArray=array();
 
     if ($contentObjectAttribute)
     {
-      $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
+      $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
       $contentObjectAttributeID = $contentObjectAttribute->attribute( 'id' );
       $version = $contentObjectAttribute->attribute( "data_int" );
       //
@@ -119,7 +119,7 @@ class ExternalMultipleOptionType extends eZDataType
       $name     = $contentClassAttribute->attribute( 'data_text3' );
       $storage  = $contentClassAttribute->attribute( 'data_text4' );
 
-      $db =& eZDB::instance();
+      $db = eZDB::instance();
       $query = "SELECT $index as val, $name as label FROM $table ORDER BY label";
       $result = $db->arrayQuery($query);
       $options = array();
@@ -147,7 +147,7 @@ class ExternalMultipleOptionType extends eZDataType
   /*!
    Returns the text.
   */
-  function title( &$contentObjectAttribute )
+  function title( $contentObjectAttribute, $name=null )
   {
     return $this->metaData($contentObjectAttribute);
   }
@@ -157,27 +157,27 @@ class ExternalMultipleOptionType extends eZDataType
     return true;
   }
 
-  function sortKey( &$contentObjectAttribute )
+  function sortKey( $contentObjectAttribute )
   {
     return $this->metaData($contentObjectAttribute);
   }
-  
+
   function sortKeyType()
   {
     return 'string';
   }
 
-  function hasObjectAttributeContent( &$contentObjectAttribute )
+  function hasObjectAttributeContent( $contentObjectAttribute )
   {
     return ($this->metaData($contentObjectAttribute) != '');
   }
- 
+
   /*!
    Returns the content.
   */
-  function &objectAttributeContent( &$contentObjectAttribute )
+  function objectAttributeContent( $contentObjectAttribute )
   {
-      $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
+      $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
       $contentObjectAttributeID = $contentObjectAttribute->attribute( 'id' );
       $version = $contentObjectAttribute->attribute( "data_int" );
       //
@@ -186,7 +186,7 @@ class ExternalMultipleOptionType extends eZDataType
       $name     = $contentClassAttribute->attribute( 'data_text3' );
       $storage  = $contentClassAttribute->attribute( 'data_text4' );
 
-      $db =& eZDB::instance();
+      $db = eZDB::instance();
       $query = "SHOW COLUMNS FROM $table";
       $result = $db->arrayQuery($query);
       $order = 'ORDER BY label';
@@ -201,7 +201,7 @@ class ExternalMultipleOptionType extends eZDataType
       $query = "SELECT $index as val, $name as label FROM $table ".$order;
 
       $result = $db->arrayQuery($query);
-      $output['options'] =& $result;
+      $output['options'] = $result;
 
       $query = "SELECT $index as val FROM $storage WHERE contentobject_attribute_id = $contentObjectAttributeID AND version = $version";
       $dbresult = $db->arrayQuery($query);
@@ -210,25 +210,25 @@ class ExternalMultipleOptionType extends eZDataType
       {
         $values[]=$row['val'];
       }
-      $output['value'] =& $values;
+      $output['value'] = $values;
       return $output;
   }
 
-  function &classAttributeContent(&$classAttribute)
+  function classAttributeContent($classAttribute)
   {
     $table = $classAttribute->attribute( 'data_text1' );
     $index = $classAttribute->attribute( 'data_text2' );
     $name  = $classAttribute->attribute( 'data_text3' );
-    $db =& eZDB::instance();
+    $db = eZDB::instance();
     $query = "SELECT $index as val, $name as label FROM $table ORDER BY label";
     $result = $db->arrayQuery($query);
-    $output['options'] =& $result;
+    $output['options'] = $result;
     return $output;
   }
 
 
 
-  function fetchClassAttributeHTTPInput( &$http, $base, &$classAttribute )
+  function fetchClassAttributeHTTPInput( $http, $base, $classAttribute )
   {
      // TODO: check that tables & cols exist
     $defaultValueTable   = $base . '_externalmultipleoption_table_'   . $classAttribute->attribute( 'id' );
@@ -290,4 +290,6 @@ class ExternalMultipleOptionType extends eZDataType
 
 
 }
-eZDataType::register( EZ_DATATYPESTRING_EXTERNALMULTIPLEOPTION, "externalmultipleoptiontype" );
+eZDataType::register( ExternalMultipleOptionType::DATA_TYPE_STRING, "externalmultipleoptiontype" );
+
+?>
