@@ -1,0 +1,71 @@
+Integrate Module
+===========================
+Provides datatypes that allows the user to select one (External Option) or more
+(External Multiple Option) values from an existing database table.
+
+External Option
+---------------------------
+Allows for a single select from an external database table to be stored in the
+content object.
+
+Stores selected item index value in data_int of attribute.
+
+When adding this datatype to a content lass the user is asked for a lookup
+table name as well as the index and label columns.  The index column must be an
+interger type.
+
+Can be used as an information collector.  This is quite handy if you need to
+the options to be consistant across a number of content objects. (the existing
+Option datatype requires that the options are entered for each content object)
+
+External Multiple Option
+--------------------------
+
+Stores selected items index values in specified table.
+
+When adding this datatype to a content lass the user is asked for a lookup
+table name, index and label columns and a storage table.  The index column must
+be an interger type.
+
+The storage table must have the following structure:
+
+CREATE TABLE cmsTimetableCategoryModes (
+  contentobject_attribute_id int(11) unsigned NOT NULL default '0',
+  version int(11) unsigned NOT NULL default '0',
+  [LooupTableIndex] int(11) unsigned NOT NULL default '0',
+  contentobject_id int(11) unsigned NOT NULL default '0',
+  PRIMARY KEY  (contentobject_attribute_id,version,[LooupTableIndex])
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+where [LooupTableIndex] is the index column as defined in the content class.
+
+Includes an extended attributefilter to find objects that have a common
+external option values.
+
+Installation
+-----------------
+Follow these steps to add the integrate module to your eZ publish installation:
+
+  1) Extract the archive into the /extension directory
+
+  2) Edit site.ini.append in /settings/override. Add the following to the file:
+
+       [ExtensionSettings]
+       ActiveExtensions[]=integrate
+
+     If you already have the [ExtensionSettings] block, just add the second line.
+
+License
+-----------------
+
+This file may be distributed and/or modified under the terms of the "GNU
+General Public License" version 2 as published by the Free Software Foundation
+
+This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+The "GNU General Public License" (GPL) is available at
+http://www.gnu.org/copyleft/gpl.html.
+
+Contact license@designit.com.au if any conditions of this licencing isn't clear to you.
+
